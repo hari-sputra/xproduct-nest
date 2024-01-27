@@ -14,8 +14,12 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  find() {
-    return this.usersRepository.find();
+  find(email: string) {
+    return this.usersRepository.find({
+      where: {
+        email,
+      },
+    });
   }
 
   async findOnBy(id: number) {
