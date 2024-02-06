@@ -7,22 +7,21 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { serialize } from 'src/interceptors/serialize/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
-import { AuthService } from './auth/auth.service';
-import { LoginUserDto } from './dtos/login-user.dto';
+import { CurrentUser } from 'src/auth/decorators/current-user/current-user.decorator';
+import { User } from './user.entity';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('users')
 @serialize(UserDto)
 export class UsersController {
-  constructor(
-    private userService: UsersService,
-    private authService: AuthService,
-  ) {}
+  constructor(private userService: UsersService) {}
 
   @Post()
   createUser(@Body() body: CreateUserDto) {
@@ -49,14 +48,10 @@ export class UsersController {
     return this.userService.destroy(parseInt(id));
   }
 
-  //   Auth
-  @Post('/register')
-  register(@Body() body: CreateUserDto) {
-    return this.authService.register(body.name, body.email, body.password);
-  }
-
-  @Post('/login')
-  login(@Body() body: LoginUserDto) {
-    return this.authService.login(body.email, body.password);
+  // test global decorator
+  @Get('/auth/current-user')
+  @UseGuards(AuthGuard)
+  currentUser(@CurrentUser() user: User) {
+    return user;
   }
 }

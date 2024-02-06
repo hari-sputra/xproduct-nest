@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -23,6 +27,9 @@ export class UsersService {
   }
 
   async findOnBy(id: number) {
+    if (!id) {
+      throw new NotAcceptableException('Session is expired');
+    }
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException('User not found');
